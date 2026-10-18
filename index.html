@@ -466,17 +466,13 @@
     </div>
 
     <script>
-        // =========================================================================
-        // PENTING: PASTE GEMINI API KEY ANDA DI DALAM TANDA PETIK DI BAWAH INI
-        // =========================================================================
-        const USER_GEMINI_API_KEY = "PASTE_GEMINI_API_KEY_ANDA_DI_SINI";
-        // =========================================================================
+        // MASUKKAN KUNCI DENGAN AWALAN AQ DI BAWAH INI:
+        const USER_GEMINI_API_KEY = "AQ.Ab8RN6LyrcfhZau1vKn28aw8Nv8kLgxajgWjTzIS3C5UZUAaBg";
 
         let uploadedImageObj = null;
         let compressedBase64Img = "";
         let customUserApiKey = "";
 
-        // Backup Offline Database for Resiliency
         const CAREER_DATABASE = {
             dokter: {
                 icon: 'fa-user-doctor',
@@ -550,7 +546,6 @@
             alert("API Key berhasil disimpan!");
         }
 
-        // Automatic Client-Side Image Compression
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -633,7 +628,6 @@
 
             const careerConfig = getCareerConfig(citaCita);
 
-            // Populate Text Details
             document.getElementById('cardNama').innerText = nama;
             document.getElementById('cardSekolah').innerText = asalSekolah;
             document.getElementById('cardKelas').innerText = 'Kelas ' + kelas;
@@ -647,13 +641,11 @@
             document.getElementById('cardTargetKuliah').innerText = targetKuliah;
             document.getElementById('cardSerialNum').innerText = 'CC-' + Math.floor(100000 + Math.random() * 900000);
 
-            // Hide Form & Show Loading Overlay
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('aiLoadingOverlay').classList.remove('hidden');
 
             updateProgress(20, "Menganalisis Wajah & Foto Diri...");
 
-            // Execute AI Counselor Text + AI Photo Transformation concurrently
             try {
                 await Promise.all([
                     generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, careerConfig),
@@ -663,19 +655,17 @@
                 console.log("Fallback executed gracefully.");
             }
 
-            // Hide Loading Overlay & Show Result
             document.getElementById('aiLoadingOverlay').classList.add('hidden');
             document.getElementById('resultSection').classList.remove('hidden');
             document.getElementById('cardOutputContainer').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 1. AI Counselor Text Recommendations Call (`gemini-2.5-flash`)
+        // 1. AI Counselor Text Recommendations Call (Model Resmi: gemini-2.5-flash)
         async function generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, fallbackConfig) {
             updateProgress(45, "Merumuskan Peta Jalan Karir...");
 
             const apiKey = getActiveApiKey();
-            if (!apiKey || apiKey === "PASTE_GEMINI_API_KEY_ANDA_DI_SINI") {
-                console.warn("API Key belum dipasang. Menjalankan data fallback.");
+            if (!apiKey) {
                 applyCounselorFallback(fallbackConfig);
                 return;
             }
@@ -741,20 +731,19 @@ Format respon WAJIB berupa JSON murni:
             });
         }
 
-        // 2. AI Image Generation Call (`gemini-3.1-flash-image`)
+        // 2. AI Image Generation Call (Model Resmi: gemini-2.5-flash)
         async function generateAIProfessionPhoto(citaCita, fallbackConfig) {
             updateProgress(70, "Menyesuaikan AI Seragam Profesi...");
 
             const apiKey = getActiveApiKey();
-            if (!apiKey || apiKey === "PASTE_GEMINI_API_KEY_ANDA_DI_SINI") {
-                console.warn("API Key belum dipasang. Menjalankan fallback canvas.");
+            if (!apiKey) {
                 renderLocalPhotoFrame(citaCita, fallbackConfig);
                 document.getElementById('cardAIPhoto').classList.add('hidden');
                 document.getElementById('photoCanvas').classList.remove('hidden');
                 return;
             }
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
             const imagePrompt = `Transform this person into a high-quality professional studio portrait wearing the authentic, full uniform or outfit of a ${citaCita}. For example, if Doctor wear white coat with stethoscope, if Pilot wear captain pilot uniform with hat, if Chef wear chef jacket & hat, if Astronaut wear space suit. Keep the same face, gender, facial features, and hair of the person in the photo. High resolution, bright aesthetic lighting, professional studio backdrop, friendly smile.`;
 
@@ -770,10 +759,7 @@ Format respon WAJIB berupa JSON murni:
                             }
                         }
                     ]
-                }],
-                generationConfig: {
-                    responseModalities: ['TEXT', 'IMAGE']
-                }
+                }]
             };
 
             try {
@@ -801,7 +787,6 @@ Format respon WAJIB berupa JSON murni:
                 console.warn("AI Image transformation failed or hit rate limit. Activating local canvas fallback.", err);
             }
 
-            // Fallback Render via Local Canvas Engine
             renderLocalPhotoFrame(citaCita, fallbackConfig);
             document.getElementById('cardAIPhoto').classList.add('hidden');
             document.getElementById('photoCanvas').classList.remove('hidden');
@@ -817,7 +802,6 @@ Format respon WAJIB berupa JSON murni:
 
             ctx.clearRect(0, 0, size, size);
 
-            // Background Fill
             const grad = ctx.createLinearGradient(0, 0, size, size);
             grad.addColorStop(0, '#f8fafc');
             grad.addColorStop(1, '#e2e8f0');
@@ -838,14 +822,12 @@ Format respon WAJIB berupa JSON murni:
                 ctx.restore();
             }
 
-            // Professional Accent Frame Overlay
             ctx.strokeStyle = config.badgeColor || '#4361EE';
             ctx.lineWidth = 10;
             ctx.beginPath();
             ctx.roundRect(16, 16, size - 32, size - 32, 24);
             ctx.stroke();
 
-            // Bottom Banner Accent
             ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
             ctx.fillRect(16, size - 80, size - 32, 64);
 
@@ -861,7 +843,6 @@ Format respon WAJIB berupa JSON murni:
             document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Fast & High Resolution JPG Download
         function downloadCardImage() {
             const cardElement = document.getElementById('cardOutputContainer');
             
