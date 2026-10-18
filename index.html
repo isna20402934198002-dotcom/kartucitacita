@@ -108,10 +108,10 @@
             </div>
             <div class="relative z-10 max-w-xl">
                 <span class="inline-block bg-white/20 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-wider mb-2">
-                    ✨ Generasi AI Seragam Profesi
+                    ✨ Generasi Kartu Cita-Cita AI
                 </span>
-                <h2 class="font-heading text-2xl md:text-3xl font-bold leading-tight mb-2">Ubah Fotomu Menjadi Seragam Profesi Impian!</h2>
-                <p class="text-white/90 text-xs md:text-sm">Isi data diri dan cita-citamu. AI akan secara otomatis memproses foto wajahmu menggunakan seragam profesi impian beserta Peta Jalan Karir yang siap dicetak!</p>
+                <h2 class="font-heading text-2xl md:text-3xl font-bold leading-tight mb-2">Rancang Kartu Profesi Impian Masa Depanmu!</h2>
+                <p class="text-white/90 text-xs md:text-sm">Isi data diri dan cita-citamu. AI akan merumuskan Peta Jalan Karir dan memasangkan foto wajahmu ke dalam bingkai profesi impian yang siap dicetak!</p>
             </div>
         </div>
 
@@ -216,7 +216,7 @@
                                 <i class="fa-solid fa-upload"></i>
                                 <span>Unggah Foto Wajah</span>
                             </button>
-                            <p class="text-xs text-slate-500 font-medium">Gunakan foto wajah yang jelas agar AI dapat mengenali dan memasangkan seragam profesi dengan sempurna.</p>
+                            <p class="text-xs text-slate-500 font-medium">Gunakan foto wajah yang jelas agar tampilan Kartu Cita-Cita Anda terlihat sangat bagus dan rapi.</p>
                         </div>
                     </div>
                 </div>
@@ -225,7 +225,7 @@
                 <div class="text-center pt-2">
                     <button type="submit" id="btnSubmit" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink hover:opacity-95 text-white font-heading font-bold text-lg shadow-xl shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition transform flex items-center justify-center mx-auto space-x-3">
                         <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
-                        <span>Generate Kartu & Foto AI Profesi</span>
+                        <span>Generate Kartu & Peta Karir AI</span>
                     </button>
                 </div>
             </form>
@@ -242,15 +242,15 @@
             </div>
             
             <div>
-                <h3 class="font-heading text-2xl font-bold text-slate-800 mb-1">Sedang Memproses Foto AI & Karir...</h3>
+                <h3 class="font-heading text-2xl font-bold text-slate-800 mb-1">Sedang Memproses Kartu Cita-Cita...</h3>
                 <p id="loadingStatusText" class="text-sm font-semibold text-brand-purple">Menghubungkan ke Gemini AI Engine...</p>
             </div>
 
             <div class="max-w-md mx-auto bg-slate-100 rounded-full h-3 overflow-hidden p-0.5">
-                <div id="progressBar" class="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink h-full rounded-full transition-all duration-500" style="width: 15%;"></div>
+                <div id="progressBar" class="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink h-full rounded-full transition-all duration-500" style="width: 20%;"></div>
             </div>
 
-            <p class="text-xs text-slate-400 font-medium">Mohon tunggu beberapa detik, AI sedang merancang seragam profesi dan merumuskan Peta Jalan Karir milikmu!</p>
+            <p class="text-xs text-slate-400 font-medium">Mohon tunggu beberapa detik, AI sedang merancang rekomendasi karir dan memasang foto profesi milikmu!</p>
         </div>
 
         <!-- CARD RESULT SECTION -->
@@ -311,11 +311,8 @@
                                 <div class="absolute -inset-2 bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink rounded-3xl blur opacity-75"></div>
                                 
                                 <div class="relative w-56 h-64 rounded-3xl bg-white p-2 shadow-xl border-2 border-slate-100 overflow-hidden flex items-center justify-center">
-                                    <!-- AI Generated / Transformed Professional Photo -->
-                                    <img id="cardAIPhoto" class="w-full h-full rounded-2xl object-cover hidden" alt="Foto AI Profesi">
-                                    
-                                    <!-- Fallback Canvas Overlay Engine -->
-                                    <canvas id="photoCanvas" class="w-full h-full rounded-2xl object-cover hidden"></canvas>
+                                    <!-- Dynamic Canvas Overlay Engine -->
+                                    <canvas id="photoCanvas" class="w-full h-full rounded-2xl object-cover"></canvas>
                                 </div>
 
                                 <!-- Profession Badge -->
@@ -455,7 +452,7 @@
                 <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <p class="text-xs text-slate-500 leading-relaxed">
-                Aplikasi ini mendukung panggilan API Gemini. Anda dapat memperbarui kunci API kustom di bawah ini kapan saja.
+                Aplikasi ini menggunakan API Gemini untuk merumuskan saran karir. Anda dapat memperbarui kunci API kustom di bawah ini kapan saja.
             </p>
             <input type="password" id="customApiKey" placeholder="Masukkan Gemini API Key" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:outline-none text-xs font-mono">
             <div class="flex justify-end space-x-2 pt-2">
@@ -466,7 +463,6 @@
     </div>
 
     <script>
-        // MASUKKAN KUNCI DENGAN AWALAN AQ DI BAWAH INI:
         const USER_GEMINI_API_KEY = "AQ.Ab8RN6LyrcfhZau1vKn28aw8Nv8kLgxajgWjTzIS3C5UZUAaBg";
 
         let uploadedImageObj = null;
@@ -644,25 +640,29 @@
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('aiLoadingOverlay').classList.remove('hidden');
 
-            updateProgress(20, "Menganalisis Wajah & Foto Diri...");
+            updateProgress(40, "Menyiapkan Bingkai Foto & Peta Karir...");
 
+            // Process AI Text Counsel and Canvas Render simultaneously
             try {
-                await Promise.all([
-                    generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, careerConfig),
-                    generateAIProfessionPhoto(citaCita, careerConfig)
-                ]);
+                await generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, careerConfig);
             } catch (err) {
-                console.log("Fallback executed gracefully.");
+                console.log("Fallback text executed.");
             }
 
-            document.getElementById('aiLoadingOverlay').classList.add('hidden');
-            document.getElementById('resultSection').classList.remove('hidden');
-            document.getElementById('cardOutputContainer').scrollIntoView({ behavior: 'smooth' });
+            // Render Client-Side Photo Frame
+            renderLocalPhotoFrame(citaCita, careerConfig);
+            updateProgress(100, "Kartu Cita-Cita Selesai!");
+
+            setTimeout(() => {
+                document.getElementById('aiLoadingOverlay').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+                document.getElementById('cardOutputContainer').scrollIntoView({ behavior: 'smooth' });
+            }, 600);
         }
 
-        // 1. AI Counselor Text Recommendations Call (Model Resmi: gemini-2.5-flash)
+        // AI Counselor Text Recommendations Call (Official Model: gemini-2.5-flash)
         async function generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, fallbackConfig) {
-            updateProgress(45, "Merumuskan Peta Jalan Karir...");
+            updateProgress(70, "Merumuskan Peta Jalan Karir AI...");
 
             const apiKey = getActiveApiKey();
             if (!apiKey) {
@@ -731,68 +731,7 @@ Format respon WAJIB berupa JSON murni:
             });
         }
 
-        // 2. AI Image Generation Call (Model Resmi: gemini-2.5-flash)
-        async function generateAIProfessionPhoto(citaCita, fallbackConfig) {
-            updateProgress(70, "Menyesuaikan AI Seragam Profesi...");
-
-            const apiKey = getActiveApiKey();
-            if (!apiKey) {
-                renderLocalPhotoFrame(citaCita, fallbackConfig);
-                document.getElementById('cardAIPhoto').classList.add('hidden');
-                document.getElementById('photoCanvas').classList.remove('hidden');
-                return;
-            }
-
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-            const imagePrompt = `Transform this person into a high-quality professional studio portrait wearing the authentic, full uniform or outfit of a ${citaCita}. For example, if Doctor wear white coat with stethoscope, if Pilot wear captain pilot uniform with hat, if Chef wear chef jacket & hat, if Astronaut wear space suit. Keep the same face, gender, facial features, and hair of the person in the photo. High resolution, bright aesthetic lighting, professional studio backdrop, friendly smile.`;
-
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [
-                        { text: imagePrompt },
-                        {
-                            inlineData: {
-                                mimeType: "image/jpeg",
-                                data: compressedBase64Img
-                            }
-                        }
-                    ]
-                }]
-            };
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-                    const mimeType = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.mimeType || 'image/png';
-
-                    if (base64Data) {
-                        updateProgress(95, "Finishing Kartu Cita-Cita...");
-                        const aiImgElement = document.getElementById('cardAIPhoto');
-                        aiImgElement.src = `data:${mimeType};base64,${base64Data}`;
-                        aiImgElement.classList.remove('hidden');
-                        document.getElementById('photoCanvas').classList.add('hidden');
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.warn("AI Image transformation failed or hit rate limit. Activating local canvas fallback.", err);
-            }
-
-            renderLocalPhotoFrame(citaCita, fallbackConfig);
-            document.getElementById('cardAIPhoto').classList.add('hidden');
-            document.getElementById('photoCanvas').classList.remove('hidden');
-        }
-
-        // Fast Client-Side Canvas Overlay Fallback Renderer
+        // Fast Client-Side Canvas Overlay Renderer
         function renderLocalPhotoFrame(profesi, config) {
             const canvas = document.getElementById('photoCanvas');
             const ctx = canvas.getContext('2d');
