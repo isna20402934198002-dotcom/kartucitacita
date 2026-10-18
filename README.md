@@ -1,1 +1,860 @@
-# kartucitacita
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Cita-Cita: Aku dan Impianku</title>
+    
+    <!-- Preconnect Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for instant export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#4361EE',
+                            cyan: '#4CC9F0',
+                            purple: '#7209B7',
+                            pink: '#F72585',
+                            yellow: '#FFD166',
+                            green: '#06D6A0',
+                            softBg: '#F4F7FE'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Fredoka', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F4F7FE;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Pixel-perfect badge layout inside cards (Fixes html2canvas displacement) */
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        @media print {
+            body { background: white !important; background-image: none !important; }
+            .no-print { display: none !important; }
+            #cardOutputContainer { box-shadow: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; border: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12 text-slate-800">
+
+    <!-- Top Header -->
+    <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200/80 no-print">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-blue to-brand-pink flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-brand-blue/30">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-bold text-xl md:text-2xl text-slate-800 tracking-wide">Kartu Cita-Cita</h1>
+                    <p class="text-xs text-slate-500 font-medium">Aku & Impian Masa Depanku • Edisi SMP / MTs</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleApiKeyModal()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-key text-amber-500"></i>
+                    <span>API Key</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 pt-6">
+
+        <!-- Welcome Banner -->
+        <div class="no-print bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-3xl p-6 text-white shadow-xl mb-8 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-20 text-9xl">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="relative z-10 max-w-xl">
+                <span class="inline-block bg-white/20 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-wider mb-2">
+                    ✨ Generasi AI Seragam Profesi
+                </span>
+                <h2 class="font-heading text-2xl md:text-3xl font-bold leading-tight mb-2">Ubah Fotomu Menjadi Seragam Profesi Impian!</h2>
+                <p class="text-white/90 text-xs md:text-sm">Isi data diri dan cita-citamu. AI akan secara otomatis memproses foto wajahmu menggunakan seragam profesi impian beserta Peta Jalan Karir yang siap dicetak!</p>
+            </div>
+        </div>
+
+        <!-- FORM INPUT CONTAINER -->
+        <div id="formSection" class="glass-card rounded-3xl p-6 md:p-8 shadow-xl no-print transition-all">
+            <div class="flex items-center space-x-3 mb-6 border-b border-slate-100 pb-4">
+                <div class="w-8 h-8 rounded-full bg-brand-blue/10 text-brand-blue flex items-center justify-center font-bold">1</div>
+                <h3 class="font-heading text-xl font-bold text-slate-800">Isi Data Diri & Cita-Cita</h3>
+            </div>
+
+            <form id="citaForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Nama Lengkap -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Nama Lengkap Siswa <span class="text-pink-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="nama" required placeholder="Contoh: Ananda Pratama" class="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-brand-blue focus:outline-none transition text-sm font-semibold">
+                        </div>
+                    </div>
+
+                    <!-- Kelas -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Kelas <span class="text-pink-500">*</span></label>
+                        <select id="kelas" required class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-brand-blue focus:outline-none transition text-sm font-semibold bg-white">
+                            <option value="7 (Tujuh)">Kelas 7 SMP / MTs</option>
+                            <option value="8 (Delapan)" selected>Kelas 8 SMP / MTs</option>
+                            <option value="9 (Sembilan)">Kelas 9 SMP / MTs</option>
+                        </select>
+                    </div>
+
+                    <!-- Asal Sekolah -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Asal Sekolah <span class="text-pink-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-school"></i>
+                            </span>
+                            <input type="text" id="asalSekolah" required placeholder="Contoh: SMP Negeri 1 Jakarta / MTsN 3 Bandung" class="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-brand-blue focus:outline-none transition text-sm font-semibold">
+                        </div>
+                    </div>
+
+                    <!-- Cita-Cita / Profesi Impian -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Cita-Cita / Profesi <span class="text-pink-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                <i class="fa-solid fa-user-astronaut"></i>
+                            </span>
+                            <input type="text" id="citaCita" required placeholder="Dokter, Pilot, Programmer, Chef, Polisi..." class="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-brand-blue focus:outline-none transition text-sm font-semibold">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <!-- Sekolah Lanjutan -->
+                    <div class="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100 space-y-3">
+                        <label class="block text-xs font-bold uppercase text-indigo-900">
+                            <i class="fa-solid fa-building-columns mr-1"></i> Sekolah Lanjutan Impian
+                        </label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                <input type="radio" name="jenisSekolah" value="SMA" checked class="w-4 h-4 text-brand-blue">
+                                <span>SMA</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                <input type="radio" name="jenisSekolah" value="SMK" class="w-4 h-4 text-brand-blue">
+                                <span>SMK</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-sm font-bold text-slate-700 cursor-pointer">
+                                <input type="radio" name="jenisSekolah" value="MA" class="w-4 h-4 text-brand-blue">
+                                <span>MA / MAK</span>
+                            </label>
+                        </div>
+                        <input type="text" id="targetSekolah" required placeholder="Nama Sekolah Target (misal: SMAN 8 / SMKN 1)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-blue focus:outline-none text-sm font-semibold">
+                    </div>
+
+                    <!-- Perguruan Tinggi Target -->
+                    <div class="bg-pink-50/60 p-4 rounded-2xl border border-pink-100 space-y-3">
+                        <label class="block text-xs font-bold uppercase text-pink-900">
+                            <i class="fa-solid fa-graduation-cap mr-1"></i> Target Perguruan Tinggi / Kuliah
+                        </label>
+                        <input type="text" id="targetKuliah" placeholder="Contoh: Universitas Indonesia (UI) / ITB / Gadjah Mada" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-pink focus:outline-none text-sm font-semibold">
+                    </div>
+                </div>
+
+                <!-- Upload Foto Diri -->
+                <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200">
+                    <label class="block text-xs font-bold uppercase text-amber-900 mb-2">
+                        <i class="fa-solid fa-camera mr-1"></i> Upload Foto Wajah Siswa <span class="text-pink-500">*</span>
+                    </label>
+                    <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                        <div id="photoPreviewBox" class="w-28 h-28 rounded-2xl bg-white border-2 border-dashed border-amber-300 flex items-center justify-center overflow-hidden relative shadow-inner shrink-0">
+                            <span class="text-[11px] text-slate-400 font-medium text-center p-2">Pilih Foto Diri</span>
+                            <img id="photoPreview" class="hidden w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 space-y-2 text-center sm:text-left">
+                            <input type="file" id="fotoInput" accept="image/*" onchange="handlePhotoUpload(event)" required class="hidden">
+                            <button type="button" onclick="document.getElementById('fotoInput').click()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md transition inline-flex items-center space-x-2">
+                                <i class="fa-solid fa-upload"></i>
+                                <span>Unggah Foto Wajah</span>
+                            </button>
+                            <p class="text-xs text-slate-500 font-medium">Gunakan foto wajah yang jelas agar AI dapat mengenali dan memasangkan seragam profesi dengan sempurna.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center pt-2">
+                    <button type="submit" id="btnSubmit" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink hover:opacity-95 text-white font-heading font-bold text-lg shadow-xl shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition transform flex items-center justify-center mx-auto space-x-3">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                        <span>Generate Kartu & Foto AI Profesi</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- AI LOADING OVERLAY -->
+        <div id="aiLoadingOverlay" class="hidden glass-card rounded-3xl p-10 text-center shadow-2xl space-y-6 my-8 no-print">
+            <div class="relative w-24 h-24 mx-auto">
+                <div class="absolute inset-0 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin"></div>
+                <div class="absolute inset-2 rounded-full border-4 border-pink-200 border-b-pink-500 animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+                <div class="w-full h-full rounded-full flex items-center justify-center text-3xl text-brand-blue">
+                    <i class="fa-solid fa-user-tie animate-bounce"></i>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="font-heading text-2xl font-bold text-slate-800 mb-1">Sedang Memproses Foto AI & Karir...</h3>
+                <p id="loadingStatusText" class="text-sm font-semibold text-brand-purple">Menghubungkan ke Gemini AI Engine...</p>
+            </div>
+
+            <div class="max-w-md mx-auto bg-slate-100 rounded-full h-3 overflow-hidden p-0.5">
+                <div id="progressBar" class="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink h-full rounded-full transition-all duration-500" style="width: 15%;"></div>
+            </div>
+
+            <p class="text-xs text-slate-400 font-medium">Mohon tunggu beberapa detik, AI sedang merancang seragam profesi dan merumuskan Peta Jalan Karir milikmu!</p>
+        </div>
+
+        <!-- CARD RESULT SECTION -->
+        <div id="resultSection" class="hidden space-y-6">
+
+            <!-- Control Actions (Top Bar) -->
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200 no-print">
+                <button onclick="editForm()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center space-x-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Edit Data Siswa</span>
+                </button>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="downloadCardImage()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-90 text-white font-bold text-xs shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh JPG (High Quality)</span>
+                    </button>
+                    <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-brand-blue hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak / PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KARTU CITA-CITA (PRINTABLE / EXPORTABLE POSTER CARD) -->
+            <div id="cardOutputContainer" class="bg-white rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-white ring-1 ring-slate-200 max-w-2xl mx-auto relative overflow-hidden transition-all">
+                
+                <!-- Card Background Accents -->
+                <div class="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-cyan-100 via-indigo-100 to-transparent rounded-full filter blur-3xl opacity-60 -z-0"></div>
+                <div class="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-pink-100 via-amber-100 to-transparent rounded-full filter blur-3xl opacity-60 -z-0"></div>
+
+                <div class="relative z-10">
+                    <!-- Top Header Badge -->
+                    <div class="flex items-center justify-between border-b-2 border-dashed border-slate-200 pb-4 mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-blue via-brand-purple to-brand-pink flex items-center justify-center text-white text-2xl shadow-lg">
+                                <i class="fa-solid fa-compass"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-heading font-extrabold text-2xl md:text-3xl text-slate-800 uppercase tracking-tight">KARTU CITA-CITA</h2>
+                                <p class="text-xs font-bold text-brand-blue uppercase tracking-widest">AKU DAN IMPIANKU</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-[10px] md:text-xs px-3 py-1 rounded-full uppercase shadow">
+                                <i class="fa-solid fa-star mr-1"></i> Profesi Masa Depan
+                            </span>
+                            <p class="text-[10px] text-slate-400 font-semibold mt-1">Edisi Siswa SMP/MTs</p>
+                        </div>
+                    </div>
+
+                    <!-- Profile & Large Photo Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center mb-6">
+                        
+                        <!-- Photo Frame Container -->
+                        <div class="md:col-span-5 flex flex-col items-center justify-center">
+                            <div class="relative">
+                                <div class="absolute -inset-2 bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink rounded-3xl blur opacity-75"></div>
+                                
+                                <div class="relative w-56 h-64 rounded-3xl bg-white p-2 shadow-xl border-2 border-slate-100 overflow-hidden flex items-center justify-center">
+                                    <!-- AI Generated / Transformed Professional Photo -->
+                                    <img id="cardAIPhoto" class="w-full h-full rounded-2xl object-cover hidden" alt="Foto AI Profesi">
+                                    
+                                    <!-- Fallback Canvas Overlay Engine -->
+                                    <canvas id="photoCanvas" class="w-full h-full rounded-2xl object-cover hidden"></canvas>
+                                </div>
+
+                                <!-- Profession Badge -->
+                                <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-slate-900 text-amber-300 border-2 border-amber-400 font-heading font-bold text-xs px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap flex items-center space-x-1.5">
+                                    <i id="cardBadgeIcon" class="fa-solid fa-award text-amber-400"></i>
+                                    <span id="cardBadgeProfesi">DOKTER</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Info Details -->
+                        <div class="md:col-span-7 space-y-3">
+                            <div class="bg-slate-50/90 p-4 rounded-2xl border border-slate-200/80">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">IDENTITAS SISWA</span>
+                                <h3 id="cardNama" class="font-heading text-2xl font-extrabold text-slate-800 leading-snug">--</h3>
+                                <div class="mt-2 grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fa-solid fa-school text-brand-blue"></i>
+                                        <span id="cardSekolah" class="truncate">--</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fa-solid fa-layer-group text-brand-purple"></i>
+                                        <span id="cardKelas">--</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Target Cita-Cita Box -->
+                            <div class="bg-gradient-to-r from-brand-blue/10 via-indigo-50 to-purple-50 p-3.5 rounded-2xl border border-indigo-100">
+                                <span class="text-[10px] font-bold text-brand-blue uppercase tracking-wider block mb-0.5">CITA-CITA / PROFESI IMPIAN</span>
+                                <div class="flex items-center justify-between">
+                                    <h4 id="cardProfesi" class="font-heading text-xl font-bold text-indigo-950">--</h4>
+                                    <span class="w-8 h-8 rounded-full bg-brand-blue text-white flex items-center justify-center text-sm shadow">
+                                        <i class="fa-solid fa-bullseye"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PETA JALAN KARIR (ROADMAP - FIXED IN-FLOW FLEXBOX LAYOUT) -->
+                    <div class="mb-6">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <div class="w-3 h-3 rounded-full bg-brand-pink shrink-0"></div>
+                            <h3 class="font-heading font-bold text-base text-slate-800 uppercase tracking-wide">PETA JALAN KARIR</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <!-- Langkah 1: SMA/SMK -->
+                            <div class="bg-blue-50/80 p-3.5 rounded-2xl border border-blue-200/80 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="step-badge bg-brand-blue text-white">
+                                            LANGKAH 1
+                                        </span>
+                                        <i class="fa-solid fa-school text-brand-blue/50 text-xs"></i>
+                                    </div>
+                                    <h4 class="font-heading text-xs font-bold text-slate-800 mb-0.5">Sekolah Lanjutan</h4>
+                                    <p id="cardTargetSekolah" class="text-xs font-extrabold text-indigo-900 mb-1.5 leading-tight">--</p>
+                                    <p id="cardRekomendasiJurusanSMA" class="text-[11px] text-slate-600 leading-snug font-medium">--</p>
+                                </div>
+                            </div>
+
+                            <!-- Langkah 2: Perguruan Tinggi -->
+                            <div class="bg-purple-50/80 p-3.5 rounded-2xl border border-purple-200/80 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="step-badge bg-brand-purple text-white">
+                                            LANGKAH 2
+                                        </span>
+                                        <i class="fa-solid fa-graduation-cap text-brand-purple/50 text-xs"></i>
+                                    </div>
+                                    <h4 class="font-heading text-xs font-bold text-slate-800 mb-0.5">Perguruan Tinggi</h4>
+                                    <p id="cardTargetKuliah" class="text-xs font-extrabold text-purple-900 mb-1.5 leading-tight">--</p>
+                                    <p id="cardRekomendasiJurusanKuliah" class="text-[11px] text-slate-600 leading-snug font-medium">--</p>
+                                </div>
+                            </div>
+
+                            <!-- Langkah 3: Skill Wajib -->
+                            <div class="bg-pink-50/80 p-3.5 rounded-2xl border border-pink-200/80 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="step-badge bg-brand-pink text-white">
+                                            LANGKAH 3
+                                        </span>
+                                        <i class="fa-solid fa-lightbulb text-brand-pink/50 text-xs"></i>
+                                    </div>
+                                    <h4 class="font-heading text-xs font-bold text-slate-800 mb-0.5">Keterampilan / Skill</h4>
+                                    <ul id="cardSkillsList" class="text-[10px] text-slate-600 space-y-1 font-semibold list-disc list-inside">
+                                        <li>--</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MOTIVASI KARIR QUOTE -->
+                    <div class="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 p-4 rounded-2xl border border-amber-200/80 mb-5">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm shadow-md shrink-0 mt-0.5">
+                                <i class="fa-solid fa-quote-left"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-[10px] font-bold uppercase text-amber-900 mb-0.5">Motivasi Langkah Karir</h5>
+                                <p id="cardQuote" class="text-xs text-slate-700 italic font-semibold leading-relaxed">
+                                    "..."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="pt-3 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-slate-400 text-[10px] gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-[10px]">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+                            <span class="font-bold text-slate-600">Kartu Cita-Cita Terverifikasi • Program Karir SMP/MTs</span>
+                        </div>
+                        <div class="font-mono text-[10px] text-slate-400">
+                            ID: <span id="cardSerialNum">CC-2026-X9</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Custom API Key -->
+    <div id="apiKeyModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-heading font-bold text-lg text-slate-800"><i class="fa-solid fa-key text-amber-500 mr-2"></i> Custom Gemini API Key</h3>
+                <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Aplikasi ini mendukung panggilan API Gemini bawaan. Namun Anda dapat mengisi Kunci API Gemini kustom di bawah ini jika diperlukan.
+            </p>
+            <input type="password" id="customApiKey" placeholder="Masukkan Gemini API Key (Opsional)" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-blue focus:outline-none text-xs font-mono">
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="toggleApiKeyModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold">Batal</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 rounded-xl bg-brand-blue text-white text-xs font-bold">Simpan Key</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImageObj = null;
+        let compressedBase64Img = "";
+        let customUserApiKey = "";
+
+        // Backup Offline Database for Fast Resiliency
+        const CAREER_DATABASE = {
+            dokter: {
+                icon: 'fa-user-doctor',
+                badgeColor: '#06D6A0',
+                rekomendasiSMA: "Saran: Pilih SMA Jurusan IPA / Biologi-Kimia. Perkuat nilai Matematika & Sains.",
+                rekomendasiKuliah: "Fakultas Kedokteran (Kedokteran Umum / Dokter Gigi / Spesialis)",
+                skills: ["Pemahaman Anatomi & Biologi", "Empati & Komunikasi Pasien", "Problem Solving & Ketelitian"],
+                quote: "Menjadi dokter bukan hanya profesi, tapi panggilan jiwa untuk menebar kebaikan dan menyelamatkan sesama."
+            },
+            pilot: {
+                icon: 'fa-plane',
+                badgeColor: '#4361EE',
+                rekomendasiSMA: "Saran: Pilih SMA Jurusan IPA atau SMK Penerbangan. Perkuat Bahasa Inggris & Fisika.",
+                rekomendasiKuliah: "Sekolah Tinggi Penerbangan (STPI) / Akademi Penerbangan / Teknik Penerbangan",
+                skills: ["Bahasa Inggris Aktif (ICAO)", "Spasial & Navigasi Udara", "Ketenangan & Kepemimpinan"],
+                quote: "Langit bukanlah batas, melainkan tempat bermainmu. Kedisiplinan adalah kunci mengendalikan kemudi penerbangan."
+            },
+            programmer: {
+                icon: 'fa-code',
+                badgeColor: '#7209B7',
+                rekomendasiSMA: "Saran: Pilih SMK Teknik Komputer Informatika (RPL/TKJ) atau SMA Jurusan IPA.",
+                rekomendasiKuliah: "Teknik Informatika / Ilmu Komputer / Rekayasa Perangkat Lunak",
+                skills: ["Logika & Algoritma Coding", "Problem Solving Cepat", "Kreativitas Teknologi"],
+                quote: "Setiap baris kode yang kamu pelajari hari ini adalah langkah menciptakan solusi bagi dunia esok hari."
+            },
+            guru: {
+                icon: 'fa-chalkboard-user',
+                badgeColor: '#FFD166',
+                rekomendasiSMA: "Saran: Pilih SMA (IPA/IPS sesuai minat pengajaran) atau MA Keagamaan.",
+                rekomendasiKuliah: "Fakultas Keguruan & Ilmu Pendidikan (FKIP) / Pendidikan Profesi Guru",
+                skills: ["Public Speaking & Mengajar", "Kesabaran & Mentoring", "Manajemen Kelas"],
+                quote: "Guru adalah pelita masa depan. Pengetahuan yang kamu bagikan akan menginspirasi generasi mendatang."
+            },
+            polisi: {
+                icon: 'fa-shield-halved',
+                badgeColor: '#1E293B',
+                rekomendasiSMA: "Saran: Pilih SMA (IPA/IPS) atau SMK. Jaga fisik, jasmani, dan kepribadian luhur.",
+                rekomendasiKuliah: "Akademi Kepolisian (AKPOL) / Sekolah Pembentukan Perwira",
+                skills: ["Kebugaran Fisik Prima", "Kedisiplinan & Integrasi", "Kepemimpinan Lapangan"],
+                quote: "Mengayomi dan melindungi masyarakat adalah bukti bakti mulia seorang pahlawan bangsa."
+            },
+            koki: {
+                icon: 'fa-utensils',
+                badgeColor: '#F72585',
+                rekomendasiSMA: "Saran: Pilih SMK Tata Boga / Culinary Art atau SMA.",
+                rekomendasiKuliah: "Akademi Kuliner / Manajemen Tata Boga / Tourism & Culinary Arts",
+                skills: ["Teknik Olah Rasa & Penyajian", "Manajemen Dapur", "Kreativitas Resep"],
+                quote: "Kreativitas rasa di dalam dapur dapat memberikan kebahagiaan bagi setiap orang yang mencicipinya."
+            },
+            default: {
+                icon: 'fa-user-astronaut',
+                badgeColor: '#4361EE',
+                rekomendasiSMA: "Saran: Pilih SMA/SMK sesuai fokus bidang studi profesi targetmu.",
+                rekomendasiKuliah: "Program Studi Perguruan Tinggi yang linear dengan cita-citamu.",
+                skills: ["Berpikir Kritis & Mandiri", "Literasi Teknologi Digital", "Komunikasi & Kerjasama"],
+                quote: "Masa depan milik mereka yang percaya pada keindahan impiannya dan berjuang meraihnya hari ini!"
+            }
+        };
+
+        function toggleApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            customUserApiKey = document.getElementById('customApiKey').value.trim();
+            toggleApiKeyModal();
+            alert("API Key berhasil disimpan!");
+        }
+
+        // Automatic Client-Side Image Compression
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const maxDim = 600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    compressedBase64Img = compressedUrl.split(',')[1];
+
+                    uploadedImageObj = new Image();
+                    uploadedImageObj.onload = function() {
+                        const preview = document.getElementById('photoPreview');
+                        preview.src = compressedUrl;
+                        preview.classList.remove('hidden');
+                    };
+                    uploadedImageObj.src = compressedUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function getCareerConfig(profesiText) {
+            const lower = profesiText.toLowerCase();
+            if (lower.includes('dok') || lower.includes('perawat') || lower.includes('medis')) return CAREER_DATABASE.dokter;
+            if (lower.includes('pilot') || lower.includes('terbang') || lower.includes('penerbang')) return CAREER_DATABASE.pilot;
+            if (lower.includes('prog') || lower.includes('dev') || lower.includes('kod') || lower.includes('tech') || lower.includes('it')) return CAREER_DATABASE.programmer;
+            if (lower.includes('guru') || lower.includes('dosen') || lower.includes('ajar')) return CAREER_DATABASE.guru;
+            if (lower.includes('poli') || lower.includes('tni') || lower.includes('tentara')) return CAREER_DATABASE.polisi;
+            if (lower.includes('koki') || lower.includes('chef') || lower.includes('boga')) return CAREER_DATABASE.koki;
+            
+            return CAREER_DATABASE.default;
+        }
+
+        function updateProgress(percentage, statusText) {
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('loadingStatusText').innerText = statusText;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (!uploadedImageObj || !compressedBase64Img) {
+                alert("Harap upload foto diri siswa terlebih dahulu!");
+                return;
+            }
+
+            const nama = document.getElementById('nama').value.trim();
+            const kelas = document.getElementById('kelas').value;
+            const asalSekolah = document.getElementById('asalSekolah').value.trim();
+            const citaCita = document.getElementById('citaCita').value.trim();
+            const jenisSekolah = document.querySelector('input[name="jenisSekolah"]:checked').value;
+            const targetSekolah = document.getElementById('targetSekolah').value.trim();
+            const targetKuliah = document.getElementById('targetKuliah').value.trim() || 'Universitas Impian';
+
+            const careerConfig = getCareerConfig(citaCita);
+
+            // Populate Text Details
+            document.getElementById('cardNama').innerText = nama;
+            document.getElementById('cardSekolah').innerText = asalSekolah;
+            document.getElementById('cardKelas').innerText = 'Kelas ' + kelas;
+            document.getElementById('cardProfesi').innerText = citaCita;
+            document.getElementById('cardBadgeProfesi').innerText = citaCita.toUpperCase();
+
+            const badgeIcon = document.getElementById('cardBadgeIcon');
+            badgeIcon.className = `fa-solid ${careerConfig.icon} text-amber-400`;
+
+            document.getElementById('cardTargetSekolah').innerText = jenisSekolah + ' ' + targetSekolah;
+            document.getElementById('cardTargetKuliah').innerText = targetKuliah;
+            document.getElementById('cardSerialNum').innerText = 'CC-' + Math.floor(100000 + Math.random() * 900000);
+
+            // Hide Form & Show Loading Overlay
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('aiLoadingOverlay').classList.remove('hidden');
+
+            updateProgress(20, "Menganalisis Wajah & Foto Diri...");
+
+            // Execute AI Counselor Text + AI Photo Transformation concurrently
+            try {
+                await Promise.all([
+                    generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, careerConfig),
+                    generateAIProfessionPhoto(citaCita, careerConfig)
+                ]);
+            } catch (err) {
+                console.log("Fallback executed gracefully.");
+            }
+
+            // Hide Loading Overlay & Show Result
+            document.getElementById('aiLoadingOverlay').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('cardOutputContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 1. AI Counselor Text Recommendations Call (`gemini-3-flash-preview`)
+        async function generateAICounselorData(nama, citaCita, jenisSekolah, targetSekolah, targetKuliah, fallbackConfig) {
+            updateProgress(45, "Merumuskan Peta Jalan Karir...");
+
+            const apiKey = customUserApiKey || window.geminiApiKey || "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const prompt = `Kamu adalah konselor karir SMP/MTs. Berikan saran karir singkat untuk siswa ${nama} yang bercita-cita menjadi ${citaCita}, hendak melanjutkan ke ${jenisSekolah} ${targetSekolah}, dan target perguruan tinggi ${targetKuliah}. 
+Format respon WAJIB berupa JSON murni:
+{
+  "rekomendasiSMA": "Saran penjurusan SMA/SMK yang pas (maksimal 15 kata)",
+  "rekomendasiKuliah": "Jurusan kuliah spesifik (maksimal 12 kata)",
+  "skills": ["Skill 1", "Skill 2", "Skill 3"],
+  "quote": "Kalimat motivasi pendorong cita-cita (1 kalimat)"
+}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        const parsed = JSON.parse(text);
+                        document.getElementById('cardRekomendasiJurusanSMA').innerText = parsed.rekomendasiSMA || fallbackConfig.rekomendasiSMA;
+                        document.getElementById('cardRekomendasiJurusanKuliah').innerText = parsed.rekomendasiKuliah || fallbackConfig.rekomendasiKuliah;
+                        document.getElementById('cardQuote').innerText = `"${parsed.quote || fallbackConfig.quote}"`;
+
+                        const skillsList = document.getElementById('cardSkillsList');
+                        skillsList.innerHTML = '';
+                        const skillsArray = parsed.skills || fallbackConfig.skills;
+                        skillsArray.forEach(skill => {
+                            const li = document.createElement('li');
+                            li.innerText = skill;
+                            skillsList.appendChild(li);
+                        });
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn("AI Counselor text error, fallback activated.", err);
+            }
+
+            // Fallback Text Setup
+            document.getElementById('cardRekomendasiJurusanSMA').innerText = fallbackConfig.rekomendasiSMA;
+            document.getElementById('cardRekomendasiJurusanKuliah').innerText = fallbackConfig.rekomendasiKuliah;
+            document.getElementById('cardQuote').innerText = `"${fallbackConfig.quote}"`;
+            const skillsList = document.getElementById('cardSkillsList');
+            skillsList.innerHTML = '';
+            fallbackConfig.skills.forEach(skill => {
+                const li = document.createElement('li');
+                li.innerText = skill;
+                skillsList.appendChild(li);
+            });
+        }
+
+        // 2. AI Image Generation Call (`gemini-3.1-flash-image` / Nano Banana)
+        async function generateAIProfessionPhoto(citaCita, fallbackConfig) {
+            updateProgress(70, "Menyesuaikan AI Seragam Profesi...");
+
+            const apiKey = customUserApiKey || window.geminiApiKey || "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+            const imagePrompt = `Transform this person into a high-quality professional studio portrait wearing the authentic, full uniform or outfit of a ${citaCita}. For example, if Doctor wear white coat with stethoscope, if Pilot wear captain pilot uniform with hat, if Chef wear chef jacket & hat, if Astronaut wear space suit. Keep the same face, gender, facial features, and hair of the person in the photo. High resolution, bright aesthetic lighting, professional studio backdrop, friendly smile.`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: imagePrompt },
+                        {
+                            inlineData: {
+                                mimeType: "image/jpeg",
+                                data: compressedBase64Img
+                            }
+                        }
+                    ]
+                }],
+                generationConfig: {
+                    responseModalities: ['TEXT', 'IMAGE']
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                    const mimeType = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.mimeType || 'image/png';
+
+                    if (base64Data) {
+                        updateProgress(95, "Finishing Kartu Cita-Cita...");
+                        const aiImgElement = document.getElementById('cardAIPhoto');
+                        aiImgElement.src = `data:${mimeType};base64,${base64Data}`;
+                        aiImgElement.classList.remove('hidden');
+                        document.getElementById('photoCanvas').classList.add('hidden');
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn("AI Image transformation failed or hit rate limit. Activating local canvas fallback.", err);
+            }
+
+            // Fallback Render via Local Canvas Engine
+            renderLocalPhotoFrame(citaCita, fallbackConfig);
+            document.getElementById('cardAIPhoto').classList.add('hidden');
+            document.getElementById('photoCanvas').classList.remove('hidden');
+        }
+
+        // Fast Client-Side Canvas Overlay Fallback Renderer
+        function renderLocalPhotoFrame(profesi, config) {
+            const canvas = document.getElementById('photoCanvas');
+            const ctx = canvas.getContext('2d');
+            const size = 500;
+            canvas.width = size;
+            canvas.height = size;
+
+            ctx.clearRect(0, 0, size, size);
+
+            // Background Fill
+            const grad = ctx.createLinearGradient(0, 0, size, size);
+            grad.addColorStop(0, '#f8fafc');
+            grad.addColorStop(1, '#e2e8f0');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+
+            if (uploadedImageObj) {
+                const img = uploadedImageObj;
+                const minDim = Math.min(img.width, img.height);
+                const sx = (img.width - minDim) / 2;
+                const sy = (img.height - minDim) / 2;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(16, 16, size - 32, size - 32, 24);
+                ctx.clip();
+                ctx.drawImage(img, sx, sy, minDim, minDim, 16, 16, size - 32, size - 32);
+                ctx.restore();
+            }
+
+            // Professional Accent Frame Overlay
+            ctx.strokeStyle = config.badgeColor || '#4361EE';
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.roundRect(16, 16, size - 32, size - 32, 24);
+            ctx.stroke();
+
+            // Bottom Banner Accent
+            ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+            ctx.fillRect(16, size - 80, size - 32, 64);
+
+            ctx.font = "bold 22px Fredoka, sans-serif";
+            ctx.fillStyle = "#FFD166";
+            ctx.textAlign = "center";
+            ctx.fillText(profesi.toUpperCase(), size / 2, size - 40);
+        }
+
+        function editForm() {
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Fast & High Resolution JPG Download
+        function downloadCardImage() {
+            const cardElement = document.getElementById('cardOutputContainer');
+            
+            html2canvas(cardElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const studentName = document.getElementById('cardNama').innerText.replace(/\s+/g, '_') || 'Siswa';
+                link.download = `Kartu_Cita_Cita_${studentName}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+            }).catch(err => {
+                alert("Menggunakan mode cetak standar...");
+                window.print();
+            });
+        }
+    </script>
+</body>
+</html>
