@@ -693,38 +693,54 @@ Format respon WAJIB berupa JSON murni:
 
 // 2. AI Profession Photo Generation (Pollinations AI Engine)
 async function generateAIProfessionPhoto(citaCita, fallbackConfig) {
-    updateProgress(70, "Meng-generate Foto Profesi AI...");
+    updateProgress(70, "Mengambil Template Profesi AI...");
 
     try {
-        // Buat prompt unik berdasarkan cita-cita dan seed acak
         const randomSeed = Math.floor(Math.random() * 1000000);
-        const promptText = encodeURIComponent(`A high quality professional studio portrait of a friendly Indonesian young person as a ${citaCita}, wearing authentic ${citaCita} uniform, highly detailed face, realistic lighting, 8k resolution, cinematic photoshoot`);
-        
-        // URL Endpoint AI Image Generator
-        const imageUrl = `https://image.pollinations.ai/prompt/${promptText}?width=600&height=700&seed=${randomSeed}&nologo=true&model=flux`;
+        const promptText = encodeURIComponent(`A high quality professional studio portrait of a friendly Indonesian young person as a ${citaCita}, wearing authentic ${citaCita} uniform, clear background, high quality`);
+        const templateUrl = `https://image.pollinations.ai/prompt/${promptText}?width=600&height=700&seed=${randomSeed}&nologo=true&model=flux`;
 
-        // Pre-load gambar agar memastikan gambar selesai dibuat sebelum ditampilkan
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = imageUrl;
-
-        await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
+        // 1. Muat gambar template dari Pollinations AI
+        const templateImg = new Image();
+        templateImg.crossOrigin = "anonymous";
+        await new Promise((res, rej) => {
+            templateImg.onload = res;
+            templateImg.onerror = rej;
+            templateImg.src = templateUrl;
         });
 
-        updateProgress(95, "Finishing Kartu Cita-Cita...");
+        // 2. Gabungkan wajah foto siswa dengan template menggunakan Canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = 600;
+        canvas.height = 700;
+        const ctx = canvas.getContext('2d');
+
+        // Gambar latar belakang profesi
+        ctx.drawImage(templateImg, 0, 0, 600, 700);
+
+        // Tempelkan wajah siswa ke area kepala template
+        if (uploadedImageObj) {
+            ctx.save();
+            ctx.beginPath();
+            // Buat area potongan lonjong di bagian wajah
+            ctx.ellipse(300, 220, 75, 95, 0, 0, 2 * Math.PI);
+            ctx.clip();
+
+            ctx.drawImage(uploadedImageObj, 210, 110, 180, 220);
+            ctx.restore();
+        }
+
+        const finalResultUrl = canvas.toDataURL('image/jpeg', 0.9);
         const aiImgElement = document.getElementById('cardAIPhoto');
-        aiImgElement.src = imageUrl;
+        aiImgElement.src = finalResultUrl;
         aiImgElement.classList.remove('hidden');
         document.getElementById('photoCanvas').classList.add('hidden');
         return;
 
     } catch (err) {
-        console.warn("AI Image generation gagal, menggunakan fallback canvas.", err);
+        console.warn("Gagal memuat template AI, beralih ke fallback canvas lokal.", err);
     }
 
-    // Fallback jika koneksi internet terputus
     renderLocalPhotoFrame(citaCita, fallbackConfig);
     document.getElementById('cardAIPhoto').classList.add('hidden');
     document.getElementById('photoCanvas').classList.remove('hidden');
