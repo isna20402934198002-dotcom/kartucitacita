@@ -691,52 +691,44 @@ Format respon WAJIB berupa JSON murni:
             });
         }
 
-        // 2. AI Image-to-Image Generation Call (Hugging Face API)
-        async function generateAIProfessionPhoto(citaCita, fallbackConfig) {
-            updateProgress(70, "Menyesuaikan AI Seragam Profesi via Hugging Face...");
+// 2. AI Profession Photo Generation (Pollinations AI Engine)
+async function generateAIProfessionPhoto(citaCita, fallbackConfig) {
+    updateProgress(70, "Meng-generate Foto Profesi AI...");
 
-            const modelUrl = "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5";
-            const prompt = `A professional high-quality studio portrait of a person as a ${citaCita}, wearing authentic ${citaCita} uniform, highly detailed face, sharp focus, 8k resolution, photorealistic`;
+    try {
+        // Buat prompt unik berdasarkan cita-cita dan seed acak
+        const randomSeed = Math.floor(Math.random() * 1000000);
+        const promptText = encodeURIComponent(`A high quality professional studio portrait of a friendly Indonesian young person as a ${citaCita}, wearing authentic ${citaCita} uniform, highly detailed face, realistic lighting, 8k resolution, cinematic photoshoot`);
+        
+        // URL Endpoint AI Image Generator
+        const imageUrl = `https://image.pollinations.ai/prompt/${promptText}?width=600&height=700&seed=${randomSeed}&nologo=true&model=flux`;
 
-            try {
-                const byteCharacters = atob(compressedBase64Img);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        // Pre-load gambar agar memastikan gambar selesai dibuat sebelum ditampilkan
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = imageUrl;
 
-                const formData = new FormData();
-                formData.append("inputs", prompt);
-                formData.append("image", blob);
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+        });
 
-                const response = await fetch(modelUrl, {
-                    headers: { Authorization: `Bearer ${hfToken}` },
-                    method: "POST",
-                    body: formData,
-                });
+        updateProgress(95, "Finishing Kartu Cita-Cita...");
+        const aiImgElement = document.getElementById('cardAIPhoto');
+        aiImgElement.src = imageUrl;
+        aiImgElement.classList.remove('hidden');
+        document.getElementById('photoCanvas').classList.add('hidden');
+        return;
 
-                if (response.ok) {
-                    const resultBlob = await response.blob();
-                    const imageUrl = URL.createObjectURL(resultBlob);
+    } catch (err) {
+        console.warn("AI Image generation gagal, menggunakan fallback canvas.", err);
+    }
 
-                    updateProgress(95, "Finishing Kartu Cita-Cita...");
-                    const aiImgElement = document.getElementById('cardAIPhoto');
-                    aiImgElement.src = imageUrl;
-                    aiImgElement.classList.remove('hidden');
-                    document.getElementById('photoCanvas').classList.add('hidden');
-                    return;
-                }
-            } catch (err) {
-                console.warn("Hugging Face API error, fallback activated.", err);
-            }
-
-            renderLocalPhotoFrame(citaCita, fallbackConfig);
-            document.getElementById('cardAIPhoto').classList.add('hidden');
-            document.getElementById('photoCanvas').classList.remove('hidden');
-        }
-
+    // Fallback jika koneksi internet terputus
+    renderLocalPhotoFrame(citaCita, fallbackConfig);
+    document.getElementById('cardAIPhoto').classList.add('hidden');
+    document.getElementById('photoCanvas').classList.remove('hidden');
+}
         function renderLocalPhotoFrame(profesi, config) {
             const canvas = document.getElementById('photoCanvas');
             const ctx = canvas.getContext('2d');
