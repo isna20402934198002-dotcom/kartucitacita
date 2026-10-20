@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kartu Cita-Cita: Aku dan Impianku</title>
     
-    <!-- Google Fonts & Style -->
+    <!-- Google Fonts & Tailwind CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
 </head>
 <body class="min-h-screen pb-12 text-slate-800">
 
-    <!-- Header -->
+    <!-- Top Header -->
     <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200/80 no-print">
         <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -46,8 +46,8 @@
                     <p class="text-xs text-slate-500 font-medium">Aku & Impian Masa Depanku • Edisi SMP / MTs</p>
                 </div>
             </div>
-            <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                <i class="fa-solid fa-circle-check"></i> AI Ready
+            <span id="apiBadge" class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> System Ready
             </span>
         </div>
     </header>
@@ -110,8 +110,234 @@
                     </div>
                 </div>
 
-                <!-- Input Foto (Upload & Kamera Langsung) -->
+                <!-- Upload & Camera Input -->
                 <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200">
                     <label class="block text-xs font-bold uppercase text-amber-900 mb-2">Foto Wajah Siswa <span class="text-pink-500">*</span></label>
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                        <div id="photoPreviewBox" class="w-28 h-28 rounded-2xl bg-white border-2 border-dashed border-amber-300 flex items-center justify-center overflow-hidden relative
+                        <div id="photoPreviewBox" class="w-28 h-28 rounded-2xl bg-white border-2 border-dashed border-amber-300 flex items-center justify-center overflow-hidden relative shrink-0">
+                            <span id="previewText" class="text-[11px] text-slate-400 font-medium text-center p-2">Pilih/Ambil Foto</span>
+                            <img id="photoPreview" class="hidden w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 space-y-3 text-center sm:text-left">
+                            <input type="file" id="fotoInput" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden">
+                            <input type="file" id="kameraInput" accept="image/*" capture="user" onchange="handlePhotoUpload(event)" class="hidden">
+
+                            <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+                                <button type="button" onclick="document.getElementById('fotoInput').click()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow transition inline-flex items-center space-x-2">
+                                    <i class="fa-solid fa-upload"></i>
+                                    <span>Unggah dari Galeri</span>
+                                </button>
+                                <button type="button" onclick="document.getElementById('kameraInput').click()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow transition inline-flex items-center space-x-2">
+                                    <i class="fa-solid fa-camera"></i>
+                                    <span>Ambil Foto Kamera</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button type="submit" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink text-white font-heading font-bold text-lg shadow-xl hover:scale-[1.01] transition flex items-center justify-center mx-auto space-x-3">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                        <span>Generate Kartu Cita-Cita</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="aiLoadingOverlay" class="hidden glass-card rounded-3xl p-10 text-center shadow-2xl space-y-6 my-8 no-print">
+            <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
+            <h3 class="font-heading text-2xl font-bold text-slate-800">Sedang Merancang Kartu Cita-Cita...</h3>
+            <p id="loadingStatusText" class="text-sm font-semibold text-brand-purple">Memproses foto dan profil siswa...</p>
+        </div>
+
+        <!-- Result Card -->
+        <div id="resultSection" class="hidden space-y-6">
+            <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-200 no-print">
+                <button onclick="editForm()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs">Edit Data</button>
+                <div class="flex space-x-2">
+                    <button onclick="downloadCardImage()" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-xs">Unduh JPG</button>
+                    <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-brand-blue text-white font-bold text-xs">Cetak / PDF</button>
+                </div>
+            </div>
+
+            <div id="cardOutputContainer" class="bg-white rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-white ring-1 ring-slate-200 max-w-2xl mx-auto relative overflow-hidden">
+                <div class="flex justify-between items-center border-b pb-4 mb-6">
+                    <div>
+                        <h2 class="font-heading font-extrabold text-2xl text-slate-800">KARTU CITA-CITA</h2>
+                        <p class="text-xs font-bold text-brand-blue">AKU DAN IMPIANKU</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center mb-6">
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="w-56 h-64 rounded-3xl bg-slate-100 border-2 border-slate-200 overflow-hidden flex items-center justify-center relative shadow-lg">
+                            <img id="cardAIPhoto" class="w-full h-full object-cover hidden" alt="Foto AI Profesi">
+                            <canvas id="photoCanvas" class="w-full h-full object-cover hidden"></canvas>
+                        </div>
+                    </div>
+                    <div class="md:col-span-7 space-y-3">
+                        <div class="bg-slate-50 p-4 rounded-2xl border">
+                            <span class="text-[10px] font-bold text-slate-400 block mb-1">IDENTITAS SISWA</span>
+                            <h3 id="cardNama" class="font-heading text-2xl font-bold text-slate-800">--</h3>
+                            <p id="cardSekolah" class="text-xs font-semibold text-slate-600">--</p>
+                            <p id="cardKelas" class="text-xs font-semibold text-brand-purple mt-1">--</p>
+                        </div>
+                        <div class="bg-indigo-50 p-3.5 rounded-2xl border border-indigo-100">
+                            <span class="text-[10px] font-bold text-brand-blue block">PROFESI IMPIAN</span>
+                            <h4 id="cardProfesi" class="font-heading text-xl font-bold text-indigo-950">--</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let compressedDataUrl = "";
+        let uploadedImageObj = null;
+
+        const FAL_KEY = "fal_sk_672ca3df8e884a2c90c32edb2f5cf129:e9f051b0d9b21917182f8ca6a38c6a25"; 
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 500;
+                    canvas.height = 500;
+
+                    const minDim = Math.min(img.width, img.height);
+                    const sx = (img.width - minDim) / 2;
+                    const sy = (img.height - minDim) / 2;
+
+                    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, 500, 500);
+
+                    compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                    uploadedImageObj = img;
+                    
+                    const preview = document.getElementById('photoPreview');
+                    preview.src = compressedDataUrl;
+                    preview.classList.remove('hidden');
+                    document.getElementById('previewText').classList.add('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (!compressedDataUrl) {
+                alert("Silakan unggah atau ambil foto siswa terlebih dahulu!");
+                return;
+            }
+
+            const nama = document.getElementById('nama').value.trim();
+            const kelas = document.getElementById('kelas').value;
+            const asalSekolah = document.getElementById('asalSekolah').value.trim();
+            const citaCita = document.getElementById('citaCita').value.trim();
+
+            document.getElementById('cardNama').innerText = nama;
+            document.getElementById('cardSekolah').innerText = asalSekolah;
+            document.getElementById('cardKelas').innerText = 'Kelas ' + kelas;
+            document.getElementById('cardProfesi').innerText = citaCita;
+
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('aiLoadingOverlay').classList.remove('hidden');
+
+            await generateAIProfessionPhoto(citaCita);
+
+            document.getElementById('aiLoadingOverlay').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('cardOutputContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function generateAIProfessionPhoto(citaCita) {
+            if (FAL_KEY && FAL_KEY.trim() !== "") {
+                try {
+                    const response = await fetch("https://fal.run/fal-ai/flux/dev/image-to-image", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Key ${FAL_KEY}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            input: {
+                                image_url: compressedDataUrl,
+                                prompt: `A professional high quality portrait photo of this person wearing an authentic full ${citaCita} uniform, studio lighting, clear face`,
+                                strength: 0.65
+                            }
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const resultUrl = data?.images?.[0]?.url || data?.image?.url;
+
+                        if (resultUrl) {
+                            const aiImgElement = document.getElementById('cardAIPhoto');
+                            aiImgElement.src = resultUrl;
+                            aiImgElement.classList.remove('hidden');
+                            document.getElementById('photoCanvas').classList.add('hidden');
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.warn("API Fal.ai terhalang CORS/Jaringan. Beralih ke Kanvas Lokal.", err);
+                }
+            }
+
+            renderLocalPhotoFrame(citaCita);
+            document.getElementById('cardAIPhoto').classList.add('hidden');
+            document.getElementById('photoCanvas').classList.remove('hidden');
+        }
+
+        function renderLocalPhotoFrame(profesi) {
+            const canvas = document.getElementById('photoCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 500;
+            canvas.height = 500;
+
+            if (uploadedImageObj) {
+                const minDim = Math.min(uploadedImageObj.width, uploadedImageObj.height);
+                const sx = (uploadedImageObj.width - minDim) / 2;
+                const sy = (uploadedImageObj.height - minDim) / 2;
+                ctx.drawImage(uploadedImageObj, sx, sy, minDim, minDim, 0, 0, 500, 500);
+            }
+
+            ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+            ctx.fillRect(0, 420, 500, 80);
+            ctx.font = "bold 22px sans-serif";
+            ctx.fillStyle = "#FFD166";
+            ctx.textAlign = "center";
+            ctx.fillText(profesi.toUpperCase(), 250, 465);
+        }
+
+        function editForm() {
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadCardImage() {
+            html2canvas(document.getElementById('cardOutputContainer')).then(canvas => {
+                const link = document.createElement('a');
+                const studentName = document.getElementById('cardNama').innerText.replace(/\s+/g, '_') || 'Siswa';
+                link.download = `Kartu_Cita_Cita_${studentName}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
